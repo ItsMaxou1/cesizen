@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+
+# Build outputs
+dist/
+build/
+
+# Expo
+.expo/
+
+# Android build artifacts (keep source, ignore generated)
+apps/mobile/android/build/
+apps/mobile/android/.gradle/
+apps/mobile/android/app/build/
+
+# iOS build artifacts (keep source, ignore generated)
+apps/mobile/ios/build/
+apps/mobile/ios/Pods/
+
+# Misc
+.DS_Store
+*.log
