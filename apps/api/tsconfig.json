@@ -8,5 +8,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true
   },
-  "exclude": ["jest.config.ts", "node_modules"]
+  "exclude": [
+    "jest.config.ts",
+    "node_modules",
+    "src/__tests__",
+    "dist"
+  ]
 }
