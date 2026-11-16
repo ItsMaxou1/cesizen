@@ -1,5 +1,5 @@
 # ===== Étape 1 : build =====
-FROM node:24-alpine AS builder
+FROM node:26-alpine AS builder
 RUN apk add --no-cache openssl
 WORKDIR /app
 COPY package*.json ./
@@ -9,7 +9,7 @@ COPY . .
 RUN npx prisma generate && npm run build
 
 # ===== Étape 2 : image d'exécution (légère, sans outils de dev) =====
-FROM node:24-alpine
+FROM node:26-alpine
 RUN apk add --no-cache openssl
 ENV NODE_ENV=production
 WORKDIR /app
