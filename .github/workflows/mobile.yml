@@ -1,0 +1,37 @@
+# PIPELINE MOBILE (apps/mobile) : vérification TypeScript + tests Jest / Testing Library
+# La publication sur les stores se fait avec EAS Build (Expo) une fois le jeton EXPO_TOKEN ajouté en secret.
+name: Pipeline Mobile
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: TypeScript + tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+      - run: npm ci
+      - name: Vérification TypeScript
+        run: npx tsc --noEmit
+      - name: Tests (Jest / Testing Library)
+        run: npx jest --ci

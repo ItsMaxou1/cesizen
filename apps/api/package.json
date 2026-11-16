@@ -10,7 +10,9 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "postbuild": "node -e \"require('fs').cpSync('src/generated','dist/generated',{recursive:true})\"",
-    "test:ci": "jest --ci --coverage"
+    "test:ci": "jest --ci --coverage",
+    "seed": "ts-node src/prisma/seed.ts",
+    "seed:prod": "node dist/prisma/seed.js"
   },
   "prisma": {
     "schema": "src/prisma/schema.prisma"

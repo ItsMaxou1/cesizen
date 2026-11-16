@@ -8,3 +8,4 @@ coverage/
 .expo/
 infra/**/*.env
 !infra/**/*.env.example
+e2e-screenshots/

@@ -5,7 +5,9 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versionnage [
 ## [Non publié]
 ### Ajouté
 - Monorepo (API, back-office web, mobile) avec historique conservé.
-- CI/CD GitHub Actions : gitleaks, npm audit, tests, lint, build, images GHCR, scan Trivy, déploiement recette/production par runner auto-hébergé, rollback, sauvegarde quotidienne, CodeQL, Dependabot.
+- Deux pipelines CI/CD GitHub Actions : **Pipeline API** (gitleaks, audit, tests unitaires Jest, build, image GHCR, Trivy, déploiement) et **Pipeline Back Office** (audit, lint, build, tests end-to-end Selenium, image, déploiement) ; pipeline Mobile ; rollback, sauvegarde quotidienne, CodeQL, Dependabot.
+- Tests end-to-end Selenium du back-office (6 scénarios) et script de seed du compte administrateur.
+- Règles GitHub (rulesets) : push direct interdit sur main et develop, PR et CI obligatoires.
 - Modèles de tickets (anomalie, évolution, sécurité) et de Pull Request.
 - Sécurité API : Helmet, limitation de débit, CORS configurable, `/api/health`, gestion d'erreurs centralisée.
 - Images Docker non-root avec healthchecks ; Nginx avec en-têtes de sécurité et proxy `/api`.

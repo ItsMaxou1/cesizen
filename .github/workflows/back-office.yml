@@ -1,0 +1,232 @@
+# =====================================================================
+#  PIPELINE BACK OFFICE (apps/web) : intégration et déploiement continus
+# =====================================================================
+#  Toute branche / PR : audit -> lint -> build -> TESTS END-TO-END SELENIUM
+#     (vrai navigateur Chrome headless contre le back-office + l'API + MySQL démarrés dans la CI)
+#  develop            : image Docker GHCR + scan Trivy -> déploiement RECETTE (runner)
+#  tag vX.Y.Z         : image versionnée -> validation manuelle -> déploiement PRODUCTION
+# =====================================================================
+name: Pipeline Back Office
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*.*.*']
+  pull_request:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: back-office-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+jobs:
+  qualite:
+    name: Audit + lint + build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Audit des dépendances de production
+        run: npm audit --omit=dev --audit-level=high
+      - name: Lint (ESLint)
+        run: npm run lint
+      - name: Build (TypeScript + Vite)
+        run: npm run build
+
+  e2e:
+    name: Tests end-to-end Selenium
+    runs-on: ubuntu-latest
+    needs: qualite
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: cesizen_e2e
+          MYSQL_USER: cesizen
+          MYSQL_PASSWORD: cesizen-e2e
+          MYSQL_ROOT_PASSWORD: root-e2e
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot-e2e --silent"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      DATABASE_URL: mysql://cesizen:cesizen-e2e@127.0.0.1:3306/cesizen_e2e
+      JWT_SECRET: secret-e2e-ci
+      PORT: '3001'
+      CORS_ORIGINS: http://localhost:4173
+      ADMIN_EMAIL: admin.e2e@cesizen.test
+      ADMIN_PASSWORD: MotDePasseE2E!2026
+      E2E_BASE_URL: http://localhost:4173
+      E2E_API_URL: http://localhost:3001
+      E2E_ADMIN_EMAIL: admin.e2e@cesizen.test
+      E2E_ADMIN_PASSWORD: MotDePasseE2E!2026
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            apps/api/package-lock.json
+            apps/web/package-lock.json
+      - name: API - installation, migrations, compte admin de test
+        working-directory: apps/api
+        run: |
+          npm ci
+          npx prisma generate
+          npm run build
+          npx prisma migrate deploy
+          npm run seed:prod
+      - name: API - démarrage en arrière-plan
+        working-directory: apps/api
+        run: nohup node dist/index.js > api.log 2>&1 &
+      - name: Back office - build et serveur de prévisualisation
+        working-directory: apps/web
+        env:
+          VITE_API_URL: http://localhost:3001
+        run: |
+          npm ci
+          npm run build
+          nohup npx vite preview --port 4173 --strictPort > web.log 2>&1 &
+      - name: Attente des services
+        run: |
+          timeout 60 bash -c 'until curl -sf http://localhost:3001/api/health; do sleep 2; done'
+          timeout 60 bash -c 'until curl -sf http://localhost:4173/login > /dev/null; do sleep 2; done'
+      - name: Tests end-to-end Selenium (Chrome headless)
+        working-directory: apps/web
+        run: npm run test:e2e
+      - name: Captures d'écran et journaux en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-echecs
+          path: |
+            apps/web/e2e-screenshots/
+            apps/api/api.log
+            apps/web/web.log
+          retention-days: 14
+
+  image:
+    name: Image Docker Back Office (GHCR + Trivy)
+    runs-on: ubuntu-latest
+    needs: e2e
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/v'))
+    steps:
+      - uses: actions/checkout@v4
+      - name: Nom d'image en minuscules
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/cesizen-web" >> "$GITHUB_ENV"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=develop,enable=${{ github.ref == 'refs/heads/develop' }}
+            type=semver,pattern={{raw}}
+            type=sha,format=short
+      - uses: docker/build-push-action@v6
+        with:
+          context: apps/web
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+      - name: Scan de vulnérabilités de l'image (Trivy)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.IMAGE }}:${{ steps.meta.outputs.version }}
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          format: table
+          exit-code: '0'
+
+  deploy-recette:
+    name: Déploiement RECETTE (Back Office)
+    needs: image
+    if: github.ref == 'refs/heads/develop'
+    runs-on: [self-hosted, cesizen-recette]
+    concurrency:
+      group: deploy-recette
+      cancel-in-progress: false
+    environment:
+      name: recette
+      url: ${{ vars.APP_URL }}
+    env:
+      COMPOSE_PROJECT_NAME: cesizen-recette
+      API_TAG: develop
+      WEB_TAG: develop
+      WEB_PORT: ${{ vars.WEB_PORT }}
+      CORS_ORIGINS: ${{ vars.APP_URL }}
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: infra
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - run: docker compose -f infra/docker-compose.yml pull web
+      - name: Mise à jour du conteneur Back Office (attente du healthcheck)
+        run: docker compose -f infra/docker-compose.yml up -d --wait --wait-timeout 180 web
+      - name: Test de fumée (proxy /api)
+        run: docker compose -f infra/docker-compose.yml exec -T web wget -qO- http://127.0.0.1:8080/api/health
+      - run: docker image prune -f
+
+  deploy-prod:
+    name: Déploiement PRODUCTION (Back Office)
+    needs: image
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: [self-hosted, cesizen-prod]
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    environment:
+      name: production
+      url: ${{ vars.APP_URL }}
+    env:
+      COMPOSE_PROJECT_NAME: cesizen-prod
+      API_TAG: ${{ github.ref_name }}
+      WEB_TAG: ${{ github.ref_name }}
+      WEB_PORT: ${{ vars.WEB_PORT }}
+      CORS_ORIGINS: ${{ vars.APP_URL }}
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: infra
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - run: docker compose -f infra/docker-compose.yml pull web
+      - name: Mise à jour du conteneur Back Office (attente du healthcheck)
+        run: docker compose -f infra/docker-compose.yml up -d --wait --wait-timeout 180 web
+      - name: Test de fumée (proxy /api)
+        run: docker compose -f infra/docker-compose.yml exec -T web wget -qO- http://127.0.0.1:8080/api/health
+      - run: docker image prune -f
