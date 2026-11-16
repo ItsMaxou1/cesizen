@@ -1,3 +1,4 @@
+import { apiUrl } from '../config'
 import { useEffect, useState } from 'react'
 
 interface Categorie {
@@ -44,7 +45,7 @@ const ExercicesPage = () => {
       }
 
       try {
-        const res = await fetch('http://localhost:3001/api/exercices', {
+        const res = await fetch(apiUrl('/api/exercices'), {
           headers: { Authorization: `Bearer ${token}` }
         })
         const data = await res.json()
@@ -77,7 +78,7 @@ const ExercicesPage = () => {
       }
 
       try {
-        const res = await fetch('http://localhost:3001/api/categories', {
+        const res = await fetch(apiUrl('/api/categories'), {
           headers: { Authorization: `Bearer ${token}` }
         })
         const data = await res.json()
@@ -95,7 +96,7 @@ const ExercicesPage = () => {
       return
     }
 
-    const url = editId ? `http://localhost:3001/api/exercices/${editId}` : 'http://localhost:3001/api/exercices'
+    const url = editId ? apiUrl(`/api/exercices/${editId}`) : apiUrl('/api/exercices')
     const method = editId ? 'PUT' : 'POST'
 
     try {
@@ -140,7 +141,7 @@ const ExercicesPage = () => {
   }
 
   const handleToggle = async (id: number) => {
-    await fetch(`http://localhost:3001/api/exercices/${id}/toggle`, {
+    await fetch(apiUrl(`/api/exercices/${id}/toggle`), {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -149,7 +150,7 @@ const ExercicesPage = () => {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Supprimer cet exercice ?')) return
-    await fetch(`http://localhost:3001/api/exercices/${id}`, {
+    await fetch(apiUrl(`/api/exercices/${id}`), {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` }
     })

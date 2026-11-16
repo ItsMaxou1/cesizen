@@ -1,3 +1,4 @@
+import { apiUrl } from '../config'
 import { useEffect, useState } from 'react'
 
 interface Commentaire {
@@ -26,7 +27,7 @@ const CommentairesPage = () => {
 
       try {
         setErreur('')
-        const res = await fetch('http://localhost:3001/api/commentaires', {
+        const res = await fetch(apiUrl('/api/commentaires'), {
           headers: { Authorization: `Bearer ${token}` }
         })
         const data = await res.json()
@@ -49,7 +50,7 @@ const CommentairesPage = () => {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Supprimer ce commentaire ?')) return
-    await fetch(`http://localhost:3001/api/commentaires/${id}`, {
+    await fetch(apiUrl(`/api/commentaires/${id}`), {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` }
     })

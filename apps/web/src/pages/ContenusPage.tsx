@@ -1,3 +1,4 @@
+import { apiUrl } from '../config'
 import { useEffect, useState } from 'react'
 
 interface Categorie {
@@ -33,7 +34,7 @@ const ContenusPage = () => {
       }
 
       try {
-        const res = await fetch('http://localhost:3001/api/contenus', {
+        const res = await fetch(apiUrl('/api/contenus'), {
           headers: { Authorization: `Bearer ${token}` }
         })
         const data = await res.json()
@@ -61,7 +62,7 @@ const ContenusPage = () => {
       }
 
       try {
-        const res = await fetch('http://localhost:3001/api/categories', {
+        const res = await fetch(apiUrl('/api/categories'), {
           headers: { Authorization: `Bearer ${token}` }
         })
         const data = await res.json()
@@ -74,7 +75,7 @@ const ContenusPage = () => {
   }, [token])
 
   const handleSubmit = async () => {
-    const url = editId ? `http://localhost:3001/api/contenus/${editId}` : 'http://localhost:3001/api/contenus'
+    const url = editId ? apiUrl(`/api/contenus/${editId}`) : apiUrl('/api/contenus')
     const method = editId ? 'PUT' : 'POST'
     await fetch(url, {
       method,
@@ -96,7 +97,7 @@ const ContenusPage = () => {
   }
 
   const handleToggle = async (id: number) => {
-    await fetch(`http://localhost:3001/api/contenus/${id}/toggle`, {
+    await fetch(apiUrl(`/api/contenus/${id}/toggle`), {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -105,7 +106,7 @@ const ContenusPage = () => {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Supprimer ce contenu ?')) return
-    await fetch(`http://localhost:3001/api/contenus/${id}`, {
+    await fetch(apiUrl(`/api/contenus/${id}`), {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` }
     })

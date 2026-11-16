@@ -1,3 +1,4 @@
+import { apiUrl } from '../config'
 import { useEffect, useState } from 'react'
 
 interface Categorie {
@@ -26,7 +27,7 @@ const CategoriesPage = () => {
       setErreur('')
 
       try {
-        const res = await fetch('http://localhost:3001/api/categories', {
+        const res = await fetch(apiUrl('/api/categories'), {
           headers: { Authorization: `Bearer ${token}` }
         })
         const data = await res.json()
@@ -53,7 +54,7 @@ const CategoriesPage = () => {
       return
     }
 
-    const url = editId ? `http://localhost:3001/api/categories/${editId}` : 'http://localhost:3001/api/categories'
+    const url = editId ? apiUrl(`/api/categories/${editId}`) : apiUrl('/api/categories')
     const method = editId ? 'PUT' : 'POST'
 
     try {
@@ -95,7 +96,7 @@ const CategoriesPage = () => {
 
     try {
       setErreur('')
-      const res = await fetch(`http://localhost:3001/api/categories/${id}`, {
+      const res = await fetch(apiUrl(`/api/categories/${id}`), {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       })

@@ -1,3 +1,4 @@
+import { apiUrl } from '../config'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
@@ -14,7 +15,7 @@ const LoginPage = () => {
     setErreur('')
 
     try {
-      const res = await fetch('http://localhost:3001/api/auth/login', {
+      const res = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, mot_de_passe: motDePasse })

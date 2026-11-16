@@ -1,3 +1,4 @@
+import { apiUrl } from '../config'
 import { useEffect, useState } from 'react'
 
 interface User {
@@ -21,7 +22,7 @@ const UtilisateursPage = () => {
 
   const toggleActif = async (id: number) => {
     try {
-      await fetch(`http://localhost:3001/api/users/${id}/toggle`, {
+      await fetch(apiUrl(`/api/users/${id}/toggle`), {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -34,7 +35,7 @@ const UtilisateursPage = () => {
   const deleteUser = async (id: number) => {
     if (!confirm('Supprimer cet utilisateur ?')) return
     try {
-      await fetch(`http://localhost:3001/api/users/${id}`, {
+      await fetch(apiUrl(`/api/users/${id}`), {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -53,7 +54,7 @@ const UtilisateursPage = () => {
 
     try {
       setErreur('')
-      const res = await fetch('http://localhost:3001/api/users', {
+      const res = await fetch(apiUrl('/api/users'), {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
@@ -79,7 +80,7 @@ const UtilisateursPage = () => {
 
     try {
       setErreur('')
-      const res = await fetch('http://localhost:3001/api/users/create-admin', {
+      const res = await fetch(apiUrl('/api/users/create-admin'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ nom, prenom, email, mot_de_passe: motDePasse })
