@@ -1,0 +1,23 @@
+# Sauvegarde quotidienne de la base de production (rétention 14 jours dans le volume mysql_backups)
+name: Sauvegarde base PRODUCTION
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # tous les jours à 2h (UTC)
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: [self-hosted, cesizen-prod]
+    environment: production
+    env:
+      COMPOSE_PROJECT_NAME: cesizen-prod
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: infra
+      - name: Dump MySQL compressé + purge des sauvegardes de plus de 14 jours
+        run: docker compose -f infra/docker-compose.yml exec -T mysql sh -c 'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" --single-transaction --routines cesizen | gzip > /backups/cesizen-$(date +%Y-%m-%d).sql.gz && find /backups -name "*.sql.gz" -mtime +14 -delete && ls -lh /backups'

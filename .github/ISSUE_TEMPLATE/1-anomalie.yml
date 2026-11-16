@@ -1,0 +1,51 @@
+name: 'Anomalie (maintenance corrective)'
+description: "Signaler un dysfonctionnement de CESIZen (API, back-office web ou application mobile)."
+title: '[ANOMALIE] '
+labels: ['type: corrective', 'statut: à qualifier']
+body:
+  - type: markdown
+    attributes:
+      value: "Merci ! Le ticket sera qualifié (sévérité, priorité) sous 1 jour ouvré selon la grille du plan de maintenance."
+  - type: dropdown
+    id: composant
+    attributes:
+      label: Composant concerné
+      options: [API, Back-office web, Application mobile, Infrastructure / déploiement]
+    validations: { required: true }
+  - type: textarea
+    id: description
+    attributes:
+      label: Description de l'anomalie
+    validations: { required: true }
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Étapes de reproduction
+      placeholder: "1. Aller sur ...\n2. Cliquer sur ...\n3. Constater ..."
+    validations: { required: true }
+  - type: textarea
+    id: attendu
+    attributes:
+      label: Comportement attendu
+    validations: { required: true }
+  - type: dropdown
+    id: environnement
+    attributes:
+      label: Environnement
+      options: [Production, Recette, Développement]
+    validations: { required: true }
+  - type: dropdown
+    id: severite
+    attributes:
+      label: Sévérité
+      options:
+        - "S1 - Bloquant : service indisponible ou données exposées"
+        - "S2 - Majeur : fonction principale inutilisable, sans contournement"
+        - "S3 - Mineur : gêne avec contournement possible"
+        - "S4 - Cosmétique"
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes:
+      label: Version concernée
+      placeholder: 'v1.0.0 (visible sur /api/health)'

@@ -1,0 +1,33 @@
+name: "Demande d'évolution (maintenance évolutive)"
+description: 'Proposer une nouvelle fonctionnalité ou une amélioration de CESIZen.'
+title: '[ÉVOLUTION] '
+labels: ['type: évolutive', 'statut: à qualifier']
+body:
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module CESIZen
+      options: [Comptes utilisateurs, Informations, Exercices de respiration, Diagnostics, Activités de détente, Tracker d'émotions, Back-office, Autre]
+    validations: { required: true }
+  - type: textarea
+    id: besoin
+    attributes:
+      label: Besoin (en tant que ... je veux ... afin de ...)
+    validations: { required: true }
+  - type: textarea
+    id: justification
+    attributes:
+      label: Valeur attendue / justification
+    validations: { required: true }
+  - type: textarea
+    id: criteres
+    attributes:
+      label: Critères d'acceptation
+      placeholder: "- [ ] ...\n- [ ] ..."
+  - type: markdown
+    attributes:
+      value: '### Réservé à l''équipe : chiffrage (complexité, délai, coût) et décision (accepté / planifié / refusé)'
+  - type: textarea
+    id: chiffrage
+    attributes:
+      label: Analyse d'impact et chiffrage

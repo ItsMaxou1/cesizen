@@ -1,0 +1,31 @@
+# Veille automatisée des dépendances : Dependabot ouvre des Pull Requests de mise à jour
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /apps/api
+    schedule: { interval: weekly, day: monday }
+    target-branch: develop
+    labels: [dépendances, api]
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directory: /apps/web
+    schedule: { interval: weekly, day: monday }
+    target-branch: develop
+    labels: [dépendances, web]
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directory: /apps/mobile
+    schedule: { interval: weekly, day: monday }
+    target-branch: develop
+    labels: [dépendances, mobile]
+    open-pull-requests-limit: 5
+  - package-ecosystem: docker
+    directories: [/apps/api, /apps/web]
+    schedule: { interval: weekly }
+    target-branch: develop
+    labels: [dépendances, docker]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: monthly }
+    target-branch: develop
+    labels: [dépendances, ci]

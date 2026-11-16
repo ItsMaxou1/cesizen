@@ -1,0 +1,28 @@
+name: 'Incident ou risque de sécurité (non sensible)'
+description: "Pour un risque de sécurité déjà public ou sans détail exploitable. Pour une faille exploitable, utilisez le signalement privé."
+title: '[SÉCURITÉ] '
+labels: ['type: sécurité', 'statut: à qualifier']
+body:
+  - type: dropdown
+    id: categorie
+    attributes:
+      label: Catégorie (OWASP Top 10)
+      options: [A01 Contrôle d'accès, A02 Cryptographie, A03 Injection, A04 Conception, A05 Configuration, A06 Composants vulnérables, A07 Authentification, A08 Intégrité, A09 Journalisation, A10 SSRF, Autre]
+    validations: { required: true }
+  - type: dropdown
+    id: criticite
+    attributes:
+      label: Criticité estimée
+      options: [Critique, Élevée, Moyenne, Faible]
+    validations: { required: true }
+  - type: textarea
+    id: description
+    attributes:
+      label: Description du risque et impact possible
+    validations: { required: true }
+  - type: checkboxes
+    id: donnees
+    attributes:
+      label: Données personnelles
+      options:
+        - label: Des données personnelles ou de santé peuvent être concernées (déclenche la procédure RGPD)

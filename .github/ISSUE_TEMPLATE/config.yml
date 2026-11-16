@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Signaler une faille de sécurité en privé
+    url: https://github.com/ItsMaxou1/cesizen/security/advisories/new
+    about: Ne publiez jamais une faille dans un ticket public. Utilisez ce formulaire privé.

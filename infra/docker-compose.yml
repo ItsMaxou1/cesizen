@@ -1,0 +1,59 @@
+# Déploiement CESIZen (recette et production utilisent le même fichier).
+# Les valeurs viennent des variables d'environnement fournies par GitHub Actions
+# (secrets et variables des environnements GitHub "recette" et "production").
+# Aucun mot de passe n'est écrit dans ce fichier.
+name: ${COMPOSE_PROJECT_NAME:-cesizen}
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: cesizen
+      MYSQL_USER: cesizen
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - mysql_backups:/backups
+    networks: [backend]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  api:
+    image: ${REGISTRY:-ghcr.io/itsmaxou1}/cesizen-api:${API_TAG:-develop}
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: mysql://cesizen:${MYSQL_PASSWORD}@mysql:3306/cesizen
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+    networks: [backend, frontend]
+    # Pas de port publié : l'API n'est joignable que via le proxy du conteneur web
+
+  web:
+    image: ${REGISTRY:-ghcr.io/itsmaxou1}/cesizen-web:${WEB_TAG:-develop}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-8081}:8080"
+    networks: [frontend]
+
+networks:
+  backend:
+    internal: true   # la base de données n'a aucun accès à Internet ni depuis l'extérieur
+  frontend: {}
+
+volumes:
+  mysql_data:
+  mysql_backups:
