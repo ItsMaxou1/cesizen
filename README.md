@@ -8,14 +8,15 @@ Monorepo du projet CESIZen (Bloc 3 CDA, Maxime Gervilla).
 | `apps/web` | Back-office d'administration React / Vite |
 | `apps/mobile` | Application mobile Expo / React Native |
 | `infra` | Docker Compose de déploiement (recette, production) |
-| `.github` | CI/CD GitHub Actions, modèles de tickets, Dependabot |
+| `.github` | Pipelines GitHub Actions (API, Back Office, Mobile), rulesets, modèles de tickets, Dependabot |
 
 ```mermaid
 flowchart LR
-  dev[Développeur] -- push --> gh[GitHub]
-  gh -- CI --> ci[Tests, audit, build]
-  ci -- develop --> rec[Recette]
-  ci -- tag vX.Y.Z --> prod[Production]
+  dev[Développeur] -- "push / PR" --> gh[GitHub]
+  gh -- "Pipeline API" --> ut[Tests unitaires Jest]
+  gh -- "Pipeline Back Office" --> e2e[Tests E2E Selenium]
+  ut & e2e -- develop --> rec[Recette]
+  ut & e2e -- "tag vX.Y.Z + validation" --> prod[Production]
 ```
 
 Voir `CONTRIBUTING.md` (règles), `SECURITY.md` (sécurité) et `CHANGELOG.md` (versions).
