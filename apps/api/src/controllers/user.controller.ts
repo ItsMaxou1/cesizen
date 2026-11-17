@@ -11,6 +11,7 @@ export const getMonProfil = async (req: AuthRequest, res: Response) => {
     });
     res.status(200).json(user);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -33,6 +34,7 @@ export const modifierMonProfil = async (req: AuthRequest, res: Response) => {
 
     res.status(200).json(user);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -44,6 +46,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
     });
     res.status(200).json(users);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -65,6 +68,7 @@ export const toggleUserActif = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: `Utilisateur ${updated.isActive ? 'activé' : 'désactivé'}` });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -75,6 +79,7 @@ export const deleteUser = async (req: Request, res: Response) => {
     await prisma.utilisateur.delete({ where: { id } });
     res.status(200).json({ message: 'Utilisateur supprimé' });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };

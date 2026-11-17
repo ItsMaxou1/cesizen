@@ -20,6 +20,7 @@ export const toggleLike = async (req: AuthRequest, res: Response) => {
       res.status(201).json({ message: 'Like ajouté' });
     }
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -31,6 +32,7 @@ export const getLikesByExercice = async (req: Request, res: Response) => {
     const count = await prisma.like.count({ where: { exerciceId } });
     res.status(200).json({ count });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -42,6 +44,7 @@ export const getLikesByContenu = async (req: Request, res: Response) => {
     const count = await prisma.like.count({ where: { contenuId } });
     res.status(200).json({ count });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };

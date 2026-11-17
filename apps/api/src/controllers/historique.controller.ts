@@ -11,6 +11,7 @@ export const addHistorique = async (req: AuthRequest, res: Response) => {
     });
     res.status(201).json(historique);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -25,6 +26,7 @@ export const getMonHistorique = async (req: AuthRequest, res: Response) => {
     });
     res.status(200).json(historiques);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -40,6 +42,7 @@ export const deleteMonHistorique = async (req: AuthRequest, res: Response) => {
       deletedCount: result.count
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };

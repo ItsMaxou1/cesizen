@@ -26,6 +26,7 @@ export const register = async (req: Request, res: Response) => {
 
     res.status(201).json({ token, user: { id: user.id, email: user.email, nom: user.nom, prenom: user.prenom, role: user.role } });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -54,6 +55,7 @@ export const login = async (req: Request, res: Response) => {
 
     res.status(200).json({ token, user: { id: user.id, email: user.email, nom: user.nom, prenom: user.prenom, role: user.role } });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };

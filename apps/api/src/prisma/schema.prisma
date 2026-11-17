@@ -77,7 +77,7 @@ model Commentaire {
   createdAt DateTime @default(now())
 
   utilisateurId Int
-  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
 
   exerciceId Int?
   exercice   ExerciceRespiration? @relation(fields: [exerciceId], references: [id])
@@ -91,7 +91,7 @@ model Like {
   date_like DateTime @default(now())
 
   utilisateurId Int
-  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
 
   exerciceId Int?
   exercice   ExerciceRespiration? @relation(fields: [exerciceId], references: [id])
@@ -105,10 +105,10 @@ model Favori {
   createdAt DateTime @default(now())
 
   utilisateurId Int
-  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
 
   exerciceId Int
-  exercice   ExerciceRespiration @relation(fields: [exerciceId], references: [id])
+  exercice   ExerciceRespiration @relation(fields: [exerciceId], references: [id], onDelete: Cascade)
 }
 
 model HistoriqueExercice {
@@ -116,10 +116,10 @@ model HistoriqueExercice {
   date_realisation DateTime @default(now())
 
   utilisateurId Int
-  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
 
   exerciceId Int
-  exercice   ExerciceRespiration @relation(fields: [exerciceId], references: [id])
+  exercice   ExerciceRespiration @relation(fields: [exerciceId], references: [id], onDelete: Cascade)
 }
 
 enum Role {
