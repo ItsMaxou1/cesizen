@@ -6,6 +6,7 @@ export const getAllCategories = async (req: Request, res: Response) => {
     const categories = await prisma.categorie.findMany();
     res.status(200).json(categories);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -20,6 +21,7 @@ export const getCategorieById = async (req: Request, res: Response) => {
     }
     res.status(200).json(categorie);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -30,6 +32,7 @@ export const createCategorie = async (req: Request, res: Response) => {
     const categorie = await prisma.categorie.create({ data: { nom, description } });
     res.status(201).json(categorie);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -41,6 +44,7 @@ export const updateCategorie = async (req: Request, res: Response) => {
     const categorie = await prisma.categorie.update({ where: { id }, data: { nom, description } });
     res.status(200).json(categorie);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -51,6 +55,7 @@ export const deleteCategorie = async (req: Request, res: Response) => {
     await prisma.categorie.delete({ where: { id } });
     res.status(200).json({ message: 'Catégorie supprimée' });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };

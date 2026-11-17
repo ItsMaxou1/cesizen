@@ -10,6 +10,7 @@ export const getAllContenus = async (req: Request, res: Response) => {
     });
     res.status(200).json(contenus);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -28,6 +29,7 @@ export const getContenuById = async (req: Request, res: Response) => {
     }
     res.status(200).json(contenu);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -41,6 +43,7 @@ export const createContenu = async (req: Request, res: Response) => {
     });
     res.status(201).json(newContenu);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -56,6 +59,7 @@ export const updateContenu = async (req: Request, res: Response) => {
     });
     res.status(200).json(updated);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -75,6 +79,7 @@ export const toggleContenuActif = async (req: Request, res: Response) => {
     });
     res.status(200).json({ message: `Contenu ${updated.isActive ? 'activé' : 'désactivé'}` });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -86,6 +91,7 @@ export const deleteContenu = async (req: Request, res: Response) => {
     await prisma.contenuInformation.delete({ where: { id } });
     res.status(200).json({ message: 'Contenu supprimé' });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };

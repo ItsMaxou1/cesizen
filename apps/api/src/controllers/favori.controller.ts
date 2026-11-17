@@ -20,6 +20,7 @@ export const toggleFavori = async (req: AuthRequest, res: Response) => {
       res.status(201).json({ message: 'Favori ajouté' });
     }
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -33,6 +34,7 @@ export const getMesFavoris = async (req: AuthRequest, res: Response) => {
     });
     res.status(200).json(favoris);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };

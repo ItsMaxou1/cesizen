@@ -24,6 +24,7 @@ export const getCommentairesByExercice = async (req: Request, res: Response) => 
     });
     res.status(200).json(commentaires);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -38,6 +39,7 @@ export const getCommentairesByContenu = async (req: Request, res: Response) => {
     });
     res.status(200).json(commentaires);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -51,6 +53,7 @@ export const createCommentaire = async (req: AuthRequest, res: Response) => {
     });
     res.status(201).json(commentaire);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -62,6 +65,7 @@ export const deleteCommentaire = async (req: Request, res: Response) => {
     await prisma.commentaire.delete({ where: { id } });
     res.status(200).json({ message: 'Commentaire supprimé' });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };

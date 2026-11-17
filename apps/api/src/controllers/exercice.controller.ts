@@ -10,6 +10,7 @@ export const getAllExercices = async (req: Request, res: Response) => {
     });
     res.status(200).json(exercices);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -28,6 +29,7 @@ export const getExerciceById = async (req: Request, res: Response) => {
     }
     res.status(200).json(exercice);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -41,6 +43,7 @@ export const createExercice = async (req: Request, res: Response) => {
     });
     res.status(201).json(exercice);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -56,6 +59,7 @@ export const updateExercice = async (req: Request, res: Response) => {
     });
     res.status(200).json(exercice);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -75,6 +79,7 @@ export const toggleExerciceActif = async (req: Request, res: Response) => {
     });
     res.status(200).json({ message: `Exercice ${updated.isActive ? 'activé' : 'désactivé'}` });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };
@@ -86,6 +91,7 @@ export const deleteExercice = async (req: Request, res: Response) => {
     await prisma.exerciceRespiration.delete({ where: { id } });
     res.status(200).json({ message: 'Exercice supprimé' });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 };

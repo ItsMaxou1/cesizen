@@ -12,6 +12,9 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versionnage [
 - Sécurité API : Helmet, limitation de débit, CORS configurable, `/api/health`, gestion d'erreurs centralisée.
 - Images Docker non-root avec healthchecks ; Nginx avec en-têtes de sécurité et proxy `/api`.
 ### Corrigé
+- Migration manquante pour la colonne `type` des exercices : sur une base neuve, tout le module Exercices renvoyait une erreur 500.
+- Suppression d'un utilisateur impossible s'il avait des commentaires, likes, favoris ou historique (suppression en cascade, droit à l'effacement RGPD) ; idem pour un exercice en favori ou dans un historique.
+- Les erreurs serveur n'étaient pas journalisées.
 - Le build de l'API incluait les tests et ne copiait pas le client Prisma (`npm start` échouait).
 - URLs de l'API codées en dur dans le web et le mobile.
 
