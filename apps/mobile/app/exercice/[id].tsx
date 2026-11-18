@@ -79,17 +79,20 @@ export default function ExerciceDetailPage() {
     setIsFavori(prev => !prev)
   }
 
+  // Un visiteur anonyme peut lancer l'exercice (sujet CESIZen) ;
+  // l'historique n'est enregistré que pour un utilisateur connecté.
   const handleLancer = async () => {
-    if (!user) {
-      router.push('/login')
-      return
+    if (user && token) {
+      try {
+        await fetch(`${API_URL}/api/historique`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ exerciceId: Number(id) })
+        })
+      } catch {
+        // l'exercice reste lançable même si l'historique ne peut pas être enregistré
+      }
     }
-
-    await fetch(`${API_URL}/api/historique`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ exerciceId: Number(id) })
-    })
     router.push(`/exercice/lancer/${id}`)
   }
 

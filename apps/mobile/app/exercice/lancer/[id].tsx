@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { API_URL } from '../../../src/config'
-import { useAuth } from '../../../src/context/useAuth'
 
 interface Exercice {
   id: number
@@ -17,7 +16,6 @@ interface Exercice {
 export default function LancerExercicePage() {
   const { id } = useLocalSearchParams()
   const router = useRouter()
-  const { user } = useAuth()
   const [exercice, setExercice] = useState<Exercice | null>(null)
   const [phase, setPhase] = useState<'inspiration' | 'apnee' | 'expiration'>('inspiration')
   const [compteur, setCompteur] = useState(0)
@@ -27,10 +25,6 @@ export default function LancerExercicePage() {
   const intervalRef = useRef<any>(null)
   const barreAnim = useRef(new Animated.Value(0)).current
   const bulleAnim = useRef(new Animated.Value(1)).current
-
-  useEffect(() => {
-    if (!user) router.replace('/login')
-  }, [user, router])
 
   useEffect(() => {
     const load = async () => {
@@ -125,8 +119,6 @@ export default function LancerExercicePage() {
     if (phase === 'apnee') return '#F5C842'
     return '#7ECECA'
   }
-
-  if (!user) return <View><Text>Redirection vers la connexion...</Text></View>
 
   if (!exercice) return <View><Text>Chargement...</Text></View>
 
